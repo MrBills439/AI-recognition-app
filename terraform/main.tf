@@ -11,8 +11,43 @@ terraform {
 }
 
 provider "aws" {
-  region = var.aws_region
+  region = "us-east-1"
 }
+
+
+# --------------------------------------------------------------------
+# Upload Frontend Files to Existing S3 Bucket
+# --------------------------------------------------------------------
+locals {
+  frontend_files = fileset("${path.module}/frontend", "**")
+}
+
+resource "aws_s3_object" "frontend_files" {
+  for_each = { for file in local.frontend_files : file => file }
+
+  bucket       = "ai-image-analyzer-frontend-2abdf5df743543de"  # your existing bucket
+  key          = each.key
+  source       = "${path.module}/frontend/${each.value}"
+  acl          = "public-read"
+  content_type = lookup({
+    "html" = "text/html",
+    "css"  = "text/css",
+    "js"   = "application/javascript",
+    "png"  = "image/png",
+    "jpg"  = "image/jpeg",
+    "jpeg" = "image/jpeg",
+    "svg"  = "image/svg+xml",
+    "json" = "application/json"
+  }, split(".", each.value)[-1], "binary/octet-stream")
+}
+
+
+output "frontend_bucket_urls" {
+  value = [
+    for o in aws_s3_object.frontend_files : "https://${o.bucket}.s3.amazonaws.com/${o.key}"
+  ]
+}
+
 
 # ==============================================================================
 # IAM Role and Policies for Lambda
@@ -179,6 +214,37 @@ resource "aws_api_gateway_integration_response" "options_integration_response" {
 
 # --- Deployment Resources ---
 
+##############################################
+# API Gateway + Lambda Integration
+##############################################
+
+
+# 2️⃣ Define a resource path (/analyze)
+resource "aws_api_gateway_resource" "analyze" {
+  rest_api_id = aws_api_gateway_rest_api.api.id
+  parent_id   = aws_api_gateway_rest_api.api.root_resource_id
+  path_part   = "analyze"
+}
+
+# 3️⃣ Create a POST method for /analyze
+resource "aws_api_gateway_method" "post_analyze" {
+  rest_api_id   = aws_api_gateway_rest_api.api.id
+  resource_id   = aws_api_gateway_resource.analyze.id
+  http_method   = "POST"
+  authorization = "NONE"
+}
+
+# 4️⃣ Integrate API Gateway with the Lambda
+resource "aws_api_gateway_integration" "lambda_integration" {
+  rest_api_id             = aws_api_gateway_rest_api.api.id
+  resource_id             = aws_api_gateway_resource.analyze.id
+  http_method             = aws_api_gateway_method.post_analyze.http_method
+  integration_http_method = "POST"
+  type                    = "AWS_PROXY"
+  uri                     = aws_lambda_function.image_analyzer_lambda.invoke_arn
+}
+
+# 5️⃣ Allow API Gateway to invoke your Lambda
 resource "aws_lambda_permission" "api_gateway_permission" {
   statement_id  = "AllowAPIGatewayInvoke"
   action        = "lambda:InvokeFunction"
@@ -187,24 +253,39 @@ resource "aws_lambda_permission" "api_gateway_permission" {
   source_arn    = "${aws_api_gateway_rest_api.api.execution_arn}/*/*"
 }
 
+# 6️⃣ Deploy the API
 resource "aws_api_gateway_deployment" "deployment" {
   rest_api_id = aws_api_gateway_rest_api.api.id
 
-  # This ensures a new deployment happens when any part of the API changes.
+  # Force new deployment when API changes
   triggers = {
-    redeployment = sha1(jsonencode(aws_api_gateway_rest_api.api.body))
+    redeployment = sha1(jsonencode({
+      resource_id   = aws_api_gateway_resource.analyze.id
+      method_id     = aws_api_gateway_method.post_analyze.id
+      integration_id = aws_api_gateway_integration.lambda_integration.id
+    }))
   }
 
   lifecycle {
     create_before_destroy = true
   }
+
+  # Ensure deployment happens after method/integration exist
+  depends_on = [
+    aws_api_gateway_integration.lambda_integration
+  ]
 }
 
+# 7️⃣ Create a stage for the deployment
 resource "aws_api_gateway_stage" "stage" {
   deployment_id = aws_api_gateway_deployment.deployment.id
   rest_api_id   = aws_api_gateway_rest_api.api.id
   stage_name    = "v1"
 }
+
+##############################################
+# END
+##############################################
 
 # ==============================================================================
 # S3 Bucket for Frontend Hosting (Modern Syntax)
