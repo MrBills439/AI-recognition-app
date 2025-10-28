@@ -1,5 +1,5 @@
 // Default API endpoint from the user's original code
-const DEFAULT_API_ENDPOINT = 'https://onwsf3b6ka.execute-api.us-east-1.amazonaws.com/v1/analyze';
+const DEFAULT_API_ENDPOINT = 'Your API link/analyze';
 
 document.addEventListener('DOMContentLoaded', () => {
     // --- DOM Elements ---
