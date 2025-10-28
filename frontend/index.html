@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Image Analyzer - Enhanced Frontend</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body class="dark-mode">
+    <div class="app-container">
+        <!-- Header with Title and Settings Toggle -->
+        <header class="app-header">
+            <div class="header-content">
+                <h1>AI Image Analyzer</h1>
+                <p>Upload, analyze, and describe images using AWS services.</p>
+            </div>
+            <button id="settingsToggle" class="settings-btn" aria-label="Open Settings">
+                <i class="fas fa-cog"></i>
+            </button>
+        </header>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+            
+            <!-- Upload and Preview Section -->
+            <section class="analysis-area">
+                <div class="upload-card">
+                    <h2>Image Upload</h2>
+                    <div class="upload-box">
+                        <input type="file" id="imageUpload" accept="image/png, image/jpeg" hidden>
+                        <label for="imageUpload" id="uploadLabel" class="upload-label">
+                            <i class="fas fa-cloud-upload-alt"></i>
+                            <span class="label-text">Click or drag an image here (PNG or JPEG)</span>
+                        </label>
+                        <div id="preview" class="preview-container hidden">
+                            <img id="imagePreview" src="#" alt="Image Preview" class="image-preview">
+                        </div>
+                    </div>
+                    <button id="analyzeBtn" class="analyze-btn" disabled>
+                        <i class="fas fa-brain"></i> Analyze Image
+                    </button>
+                </div>
+            </section>
+
+            <!-- Results Section -->
+            <section id="results" class="results-section hidden">
+                <h2>Analysis Results</h2>
+                <div id="loader" class="loader">
+                    <div class="spinner"></div>
+                    <p>Analyzing image and generating description...</p>
+                </div>
+                <div id="resultContent" class="result-content">
+                     <div class="result-box">
+                        <h3><i class="fas fa-comment-dots"></i> AI Generated Description:</h3>
+                        <p id="description" class="description-text"></p>
+                     </div>
+                     <div class="result-box">
+                        <h3><i class="fas fa-tags"></i> Detected Labels:</h3>
+                        <div id="labels" class="labels-container">
+                            <!-- Label tags will be inserted here -->
+                        </div>
+                     </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- Settings Modal (Administration) -->
+        <div id="settingsModal" class="modal hidden">
+            <div class="modal-content">
+                <span class="close-btn">&times;</span>
+                <h2><i class="fas fa-cogs"></i> Administration Settings</h2>
+
+                <!-- API Endpoint Setting -->
+                <div class="setting-group">
+                    <label for="apiEndpoint">AWS API Gateway Endpoint:</label>
+                    <input type="url" id="apiEndpoint" placeholder="e.g., https://xyz123.execute-api.us-east-1.amazonaws.com/v1/analyze">
+                    <small>This is the URL where the analysis request will be sent.</small>
+                </div>
+
+                <!-- Theme Toggle Setting -->
+                <div class="setting-group theme-setting">
+                    <label>App Theme:</label>
+                    <div class="theme-toggle-switch">
+                        <input type="checkbox" id="themeToggle" hidden>
+                        <label for="themeToggle" class="switch-label">
+                            <span class="slider"></span>
+                            <span class="mode-text dark-text">Dark Mode</span>
+                            <span class="mode-text light-text">Light Mode</span>
+                        </label>
+                    </div>
+                </div>
+
+                <button id="saveSettingsBtn" class="save-btn">Save Settings</button>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer class="app-footer">
+            <p>&copy; 2025 AI Image Analyzer. Built with AWS Rekognition, Bedrock & Terraform.</p>
+        </footer>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
