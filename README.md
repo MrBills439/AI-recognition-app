@@ -58,6 +58,9 @@ All resources were successfully deployed and verified via the AWS Management Con
 ---
 
 ## 🧩 Challenges & Solutions
+<p align="center">
+  <img src="./frontend/Model databases - Page 1 Architecture Diagram.png" alt="AI Architecture Diagram" width="700"/>
+</p>
 
 ### Challenge
 When creating the API Gateway with Terraform, the Lambda integration initially failed due to incorrect resource linking.
