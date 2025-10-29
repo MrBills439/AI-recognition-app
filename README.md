@@ -59,7 +59,7 @@ All resources were successfully deployed and verified via the AWS Management Con
 
 ## 🧩 Challenges & Solutions
 <p align="center">
-  <img src="./frontend/Model databases - Page 1 Architecture Diagram.png" alt="AI Architecture Diagram" width="700"/>
+  <img src="./frontend/Screenshot 2025-10-28 at 16.40.21.png" alt="error from API" width="700"/>
 </p>
 
 ### Challenge
