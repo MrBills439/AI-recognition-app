@@ -40,7 +40,7 @@ Develop a solution that:
 ## ☁️ Architecture Diagram
 
 <p align="center">
-  <img src="./frontend/architecture.png" alt="AI Architecture Diagram" width="700"/>
+  <img src="./frontend/Model databases - Page 1 Architecture Diagram.png" alt="AI Architecture Diagram" width="700"/>
 </p>
 
 User → S3 (Frontend) → API Gateway → Lambda → Rekognition → Bedrock → Lambda → Frontend
