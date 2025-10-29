@@ -37,6 +37,13 @@ Develop a solution that:
 ---
 
 ## ☁️ AWS Architecture Diagram
+## ☁️ Architecture Diagram
+
+<p align="center">
+  <img src="./frontend/architecture.png" alt="AI Architecture Diagram" width="700"/>
+</p>
+
+User → S3 (Frontend) → API Gateway → Lambda → Rekognition → Bedrock → Lambda → Frontend
 
 
 ---
